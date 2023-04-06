@@ -1,0 +1,257 @@
+
+/* Merged Plone Javascript file
+ * This file is dynamically assembled from separate parts.
+ * Some of these parts have 3rd party licenses or copyright information attached
+ * Such information is valid for that section,
+ * not for the entire composite file
+ * originating files are separated by - filename.js -
+ */
+
+/* - ol.js - */
+// http://magmont.exponent.com/portal_javascripts/ol.js?original=1
+var map=null;var ProjectsLayer=null;var ProjectsLayer_rm=null;var tileSource_tailing=null;var tileSource_property=null;OpenLayers.IMAGE_RELOAD_ATTEMPTS=3;window.onresize=function(){setMapWindowSize()}
+function setMapWindowSize(){var NS=getWindowSize();if((NS.height-210)>250){document.getElementById('divMap').style.height=(NS.height * 0.7)+'px'}
+document.getElementById('divMap').style.width=((NS.width)-300)+'px'}
+function getWindowSize(){var e=new Object();if(window.self&&self.innerWidth){e.width=self.innerWidth;e.height=self.innerHeight}
+else if(document.documentElement&&document.documentElement.clientHeight){e.width=document.documentElement.clientWidth;e.height=document.documentElement.clientHeight}
+else{e.width=document.body.clientWidth;e.height=document.body.clientHeight}
+return e}
+function _el(a){var b=document.getElementById(a);return b}
+function onGCLoad(){var customIcon=new VECustomIconSpecification();customIcon.Image="./icons/circle.png";customIcon.ImageOffset=new VEPixel(9,5);customIcon.TextContent=" ";var numShapes=currentLayer.GetShapeCount();if(numShapes==0){alert("No Station was found with GPS coordinates")}
+if(numShapes>0){for(var i=0;i<numShapes;++i){var shape=currentLayer.GetShapeByIndex(i);shape.SetCustomIcon(customIcon)}}}
+function ShowTailing(url){tileSource_tailing=new VETileSourceSpecification("tailing",url);tileSource_tailing.Opacity=1;tileSource_tailing.ZIndex=1;map.AddTileLayer(tileSource_tailing,true)}
+function ShowProperty(url){tileSource_property=new VETileSourceSpecification("property",url);tileSource_property.Opacity=1;tileSource_property.ZIndex=1;map.AddTileLayer(tileSource_property,true)}
+function HideTileLayers(){if(tileSource_tailing!=null){map.HideTileLayer("tailing")}
+if(tileSource_property!=null){map.HideTileLayer("property")}}
+function ShowFeatureLayer(){HideTileLayers();if(document.getElementById('tailing').checked==1){if(tileSource_tailing!=null){map.ShowTileLayer("tailing")}
+else{ShowTailing('http://sfclientweb2.exponent.com/tilecache/tilecache.py?ve=true&layer=mm_bing_tailing&tile=%4')}}
+if(document.getElementById('property').checked==1){if(tileSource_property!=null){map.ShowTileLayer("property")}
+else{ShowProperty('http://sfclientweb2.exponent.com/tilecache/tilecache.py?ve=true&layer=mm_bing_property&tile=%4')}}}
+function createUrl(){var strUrl="";var sample_material=""
+for(i=0;i<_el("d_sampmain.sample_material").length;i++){if(_el("d_sampmain.sample_material")[i].selected){sample_material+=_el("d_sampmain.sample_material")[i].value+","}}
+if(sample_material.length>0){sample_material=sample_material.slice(0,-1);strUrl+="d_sampmain.sample_material="+sample_material+"&"}
+txtDate1=document.getElementById("d_sampcoll.txtDate1").value;strUrl+="d_sampcoll.txtDate1="+txtDate1+"&";txtDate2=document.getElementById("d_sampcoll.txtDate2").value;strUrl+="d_sampcoll.txtDate2="+txtDate2+"&";var study_id=""
+for(i=0;i<_el("d_studylocation.study_id").length;i++){if(_el("d_studylocation.study_id")[i].selected){study_id+=_el("d_studylocation.study_id")[i].value+","}}
+if(study_id.length>0){study_id=study_id.slice(0,-1);strUrl+="d_studylocation.study_id="+study_id+"&"}
+strUrl+="searchType=Study&";var v=map.GetMapView();var Top_Left=v.TopLeftLatLong
+strUrl+="maxLat="+Top_Left.Latitude+"&";strUrl+="minLong="+Top_Left.Longitude+"&";var Botton_Right=v.BottomRightLatLong
+strUrl+="minLat="+Botton_Right.Latitude+"&";strUrl+="maxLong="+Botton_Right.Longitude+"&";strUrl+="bMapExtent="+"False";return strUrl}
+function CheckMap(){var strUrl=createUrl();checkStationCount(strUrl)}
+function CheckMetadata(){map.GetImageryMetadata(MetadataCallback,null)}
+function MetadataCallback(metaData){var start_date=String(metaData.DateRangeStart);start_date=start_date.replace("00:00:00 PDT ","");var end_date=String(metaData.DateRangeEnd);end_date=end_date.replace("00:00:00 PDT ","");alert("Imagery date range: "+start_date+" - "+end_date)}
+function setResults(response){doc=response.responseText;document.getElementById('divKMLName').innerHTML=doc;document.getElementById('divKMLName').style.display="block"}
+function DownloadData(){var strOpenFile='http://teck-ucr.exponent.com/station_overview/station_data_download?usergroups=Exponent&kml_file='+document.getElementById('kml_name').value}
+function UpdateMap(){if(ProjectsLayer!=null){map.DeleteShapeLayer(ProjectsLayer)}
+ProjectsLayer=new VEShapeLayer();var layerSpec=new VEShapeSourceSpecification(VEDataType.ImportXML,'http://teck-ucr.exponent.com/teck_kml/'+document.getElementById('kml_name').value,ProjectsLayer);map.ImportShapeLayerData(layerSpec,null,0)}
+function GetMap(){setMapWindowSize();map=new VEMap('divMap');map.LoadMap(new VELatLong(37.635836,-91.090196),13,VEMapStyle.Aerial,false);map.DeleteAllShapes()}
+function loadMap(){if(window.attachEvent){window.attachEvent("onload",GetMap)} else{window.addEventListener("load",GetMap,false)}}
+
+/* - PopulateFields.js - */
+// http://magmont.exponent.com/portal_javascripts/PopulateFields.js?original=1
+function createRequestObject(){var xmlHttp;try{xmlHttp=new XMLHttpRequest()}
+catch(e){try{xmlHttp=new ActiveXObject("Msxml2.XMLHTTP")}
+catch(e){try{xmlHttp=new ActiveXObject("Microsoft.XMLHTTP")}
+catch(e){alert("You browser does not support AJAX!");return false}}}
+return xmlHttp}
+function sndReq(divField,url){var http=createRequestObject();http.open('get',url);http.onreadystatechange=function(){if(http.readyState==4){if(http.status==200){var response=http.responseText;document.getElementById(divField).innerHTML=response}}}
+http.send(null)}
+function CallRestService(url){var http=createRequestObject();http.open('get',url);http.onreadystatechange=function(){if(http.readyState==4){if(http.status==200){var response=http.responseText;var start_date=response.substring(response.indexOf('<VintageStart>')+14,response.indexOf('</VintageStart>'))
+var end_date=response.substring(response.indexOf('<VintageEnd>')+12,response.indexOf('</VintageEnd>'))
+alert("Imagery date range: "+start_date+" to "+end_date)}}}
+http.send(null)}
+function _el(a){var b=document.getElementById(a);return b}
+function getAnalytesOnAnalType(){var n=_el("analyte_type").selectedIndex
+var group=_el("analyte_type")[n].value
+var url='./subAnalytesOnAnalType?group='+group;var divFieldName="formAnalytes";sndReq(divFieldName,url);var url='./subMaterialsOnAnalyte?group='+group;var divFieldName="formMaterials";sndReq(divFieldName,url);var url='./subBasisOnMaterial?group='+group;var divFieldName="formBasis";sndReq(divFieldName,url);var url="./subGraphEmpty";var divFieldName="divGraph";sndReq(divFieldName,url);var url="./subGraphEmpty";var divFieldName="divGraphButton";sndReq(divFieldName,url)}
+function getMaterialsOnAnalyte(){var n=_el("analyte").selectedIndex
+var analyte=_el("analyte")[n].value
+var url='./subMaterialsOnAnalyte?analyte='+analyte;var divFieldName="formMaterials";sndReq(divFieldName,url);var url='./subBasisOnMaterial?analyte='+analyte;var divFieldName="formBasis";sndReq(divFieldName,url);var url="./subGraphEmpty";var divFieldName="divGraph";sndReq(divFieldName,url);var url="./subGraphEmpty";var divFieldName="divGraphButton";sndReq(divFieldName,url)}
+function getBasisOnMaterial(){var n=_el("analyte").selectedIndex
+var analyte=_el("analyte")[n].value
+var m=_el("material").selectedIndex
+var material=_el("material")[m].value
+var url='./subBasisOnMaterial?analyte='+analyte+'&material='+material;var divFieldName="formBasis";sndReq(divFieldName,url);var url="./subGraphEmpty";var divFieldName="divGraph";sndReq(divFieldName,url);var url="./subGraphEmpty";var divFieldName="divGraphButton";sndReq(divFieldName,url)}
+function getStationOnBasis(){var n=_el("analyte").selectedIndex
+var analyte=_el("analyte")[n].value
+var m=_el("material").selectedIndex
+var material=_el("material")[m].value
+var l=_el("basis").selectedIndex
+var basis=_el("basis")[l].value
+var url='./subStationOnBasis?analyte='+analyte+'&material='+material+'&basis='+basis
+var divFieldName="formStation";sndReq(divFieldName,url)}
+function SearchMetData(){var start_date=_el("start_date").value
+var end_date=_el("end_date").value
+var url='./subMetData?start_date='+start_date+'&end_date='+end_date
+var divFieldName="frmMetResults";sndReq(divFieldName,url)}
+function SearchDamData(){var quarter='';for(i=0;i<_el("quarter").length;i++){if(_el("quarter")[i].selected){quarter=quarter+"'"+_el("quarter")[i].value+"',"}}
+if(quarter.length>0){quarter=quarter.slice(0,-1)}
+var location='';for(i=0;i<_el("location").length;i++){if(_el("location")[i].selected){location=location+"'"+_el("location")[i].value+"',"}}
+if(location.length>0){location=location.slice(0,-1)}
+var inspection_area='';for(i=0;i<_el("inspection_area").length;i++){if(_el("inspection_area")[i].selected){inspection_area=inspection_area+"'"+_el("inspection_area")[i].value+"',"}}
+if(inspection_area.length>0){inspection_area=inspection_area.slice(0,-1)}
+var inspected_item='';for(i=0;i<_el("inspected_item").length;i++){if(_el("inspected_item")[i].selected){inspected_item=inspected_item+"'"+_el("inspected_item")[i].value+"',"}}
+if(inspected_item.length>0){inspected_item=inspected_item.slice(0,-1)}
+var url='./subDamData?quarter='+quarter+'&location='+location+'&inspection_area='+inspection_area+'&inspected_item='+inspected_item
+var divFieldName="frmDamResults";sndReq(divFieldName,url)}
+function SearchGWData(){var start_date=_el("start_date").value
+var end_date=_el("end_date").value
+var url='./subGWData?start_date='+start_date+'&end_date='+end_date
+var divFieldName="frmGWResults";sndReq(divFieldName,url)}
+function SearchTailingData(){var url='./subTailingData';var divFieldName="frmTailingResults";sndReq(divFieldName,url)}
+function SearchGWLevel(){var start_date=_el("start_date").value
+var end_date=_el("end_date").value
+var url='./subGWLevel?start_date='+start_date+'&end_date='+end_date
+var divFieldName="frmGWLevelResults";sndReq(divFieldName,url)}
+function checkMetData(){var data_met=new Array(2)
+data_met[0]=_el('start_date').value;data_met[1]=_el('end_date').value;return data_met}
+function getMetChart_depth(data_met){var url1='./charts_met_depth?start_date='+data_met[0]+'&end_date='+data_met[1];document.getElementById("chartImgDepth").src=url1;document.getElementById("chartImgDepth").alt="No water depth data available for the time period."}
+function getMetChart_precip(data_met){var url2='./charts_met_precip?start_date='+data_met[0]+'&end_date='+data_met[1];document.getElementById("chartImgPrecip").src=url2;document.getElementById("chartImgPrecip").alt="No precipitation data available for the time period."}
+function getMetChart_precip_hobo(data_met){var url3='./charts_met_precip_hobo?start_date='+data_met[0]+'&end_date='+data_met[1];document.getElementById("chartImgPrecipHOBO").src=url3;document.getElementById("chartImgPrecipHOBO").alt="No precipitation data available for the time period."}
+function showPhoto(){var divFieldName="divShowPhotos";var url="./searchWaitMessage";sndReq(divFieldName,url);var image_collection='';image_collection=_el("image_collection").value
+if(image_collection==''){url="./searchBlankMessage"}
+else{url="./showPhotoResults?image_collection="+image_collection}
+sndReq(divFieldName,url)}
+function checkStationCount(url){var divFieldName="divStationCount";var url_waitmessage="./searchWaitMessage";sndReq(divFieldName,url_waitmessage);var full_url="./station_count?"+url;sndReq(divFieldName,full_url)}
+function clearStationCount(){var divFieldName="divStationCount";var url_waitmessage="./searchWaitMessageEnd";sndReq(divFieldName,url_waitmessage)}
+function showSearchCriteria(){var divFieldName="divSearchCriteria";var data_category='';data_category=_el("data_category").value
+var full_url="./"+data_category;sndReq(divFieldName,full_url)}
+function showTaxon(){if(_el("material").value=='Tissue'){_el("taxon").disabled=false}
+else{_el("taxon").disabled=true}}
+function showStudiesRefusal(){var refusal='';if(_el("chkShowStudiesRefusal").checked==1){refusal='true'
+_el("query_all_stations").disabled=true;_el("query_study_stations").disabled=true;_el("rejected").disabled=true;_el("query_refusal_stations").disabled=false}
+else{_el("query_all_stations").disabled=false;_el("query_study_stations").disabled=false;_el("rejected").disabled=false;_el("query_refusal_stations").disabled=true}
+url="./subStudies?refusal="+refusal;var divFieldName="divStationStudies"
+sndReq(divFieldName,url)}
+function showBioassayCtl(){if(_el("chkShowBioassayCtl").checked==1){_el("query_bioassay").disabled=true;_el("query_bioassay_control").disabled=false}
+else{_el("query_bioassay").disabled=false;_el("query_bioassay_control").disabled=true}}
+function PopulateOnDocStudy(){var study_id='';for(i=0;i<_el("study_id").length;i++){if(_el("study_id")[i].selected){study_id=study_id+"'"+_el("study_id")[i].value+"',"}}
+if(study_id.length>0){study_id=study_id.slice(0,-1)}
+var url_doctype="./subDocType?study_id="+study_id;var divFieldName="divDocType";sndReq(divFieldName,url_doctype);var url_docid="./subDocID?study_id="+study_id;var divFieldName="divDocID";sndReq(divFieldName,url_docid)}
+function PopulateOnDocType(){var study_id='';for(i=0;i<_el("study_id").length;i++){if(_el("study_id")[i].selected){study_id=study_id+"'"+_el("study_id")[i].value+"',"}}
+if(study_id.length>0){study_id=study_id.slice(0,-1)}
+var doctype='';for(i=0;i<_el("DOCTYPE").length;i++){if(_el("DOCTYPE")[i].selected){doctype=doctype+"'"+_el("DOCTYPE")[i].value+"',"}}
+if(doctype.length>0){doctype=doctype.slice(0,-1)}
+var url_docid="./subDocID?study_id="+study_id+"&doctype="+doctype;var divFieldName="divDocID";sndReq(divFieldName,url_docid)}
+function PopulateOnDocCategory(){var doc_cat='';for(i=0;i<_el("doc_cat").length;i++){if(_el("doc_cat")[i].selected){doc_cat=doc_cat+"'"+_el("doc_cat")[i].value+"',"}}
+if(doc_cat.length>0){doc_cat=doc_cat.slice(0,-1)}
+var url_doccat="./subDocType?doc_cat="+doc_cat;var divFieldName="divDOCTYPE";sndReq(divFieldName,url_doccat)}
+function showAllStations(){var full_url="./station_all";var divFieldName="divAllStations";sndReq(divFieldName,full_url)}
+function show_download_all(new_win){window.open('',new_win,'width=100',height='50')}
+function OnDivScroll(controlname){var lstDataSources=_el(controlname);if(lstDataSources.options.length>5){lstDataSources.size=lstDataSources.options.length}
+else{lstDataSources.size=5}}
+function PopulateOnTrackProject(){var project='';for(i=0;i<_el("d_Schedule_Tracking.Project").length;i++){if(_el("d_Schedule_Tracking.Project")[i].selected){project=project+"'"+_el("d_Schedule_Tracking.Project")[i].value+"',"}}
+if(project.length>0){project=project.slice(0,-1)}
+var url='';url="./subTrackLab?project="+project;var divFieldName="divTrackLab";sndReq(divFieldName,url)}
+function PopulateOnTrackLab(){var project='';for(i=0;i<_el("d_Schedule_Tracking.Project").length;i++){if(_el("d_Schedule_Tracking.Project")[i].selected){project=project+"'"+_el("d_Schedule_Tracking.Project")[i].value+"',"}}
+if(project.length>0){project=project.slice(0,-1)}
+var lab='';for(i=0;i<_el("d_Schedule_Tracking.Lab").length;i++){if(_el("d_Schedule_Tracking.Lab")[i].selected){lab=lab+"'"+_el("d_Schedule_Tracking.Lab")[i].value+"',"}}
+if(lab.length>0){lab=lab.slice(0,-1)}
+var url='';url="./subTrackSDG?project="+project+"&lab="+lab;var divFieldName="divTrackSDG";sndReq(divFieldName,url)}
+function PopulateOnSampMaterial(){var SampMaterial='';for(i=0;i<_el("selectSampMaterial").length;i++){if(_el("selectSampMaterial")[i].selected){SampMaterial=SampMaterial+"'"+_el("selectSampMaterial")[i].value+"',"}}
+if(SampMaterial.length>0){SampMaterial=SampMaterial.slice(0,-1)}
+var url='';url="./subStudyLocation?SampMaterial="+SampMaterial;var divFieldName="divSampLocation";sndReq(divFieldName,url)}
+function PopulateOnBioasType_Bioassay(){var url_waitmessage="./searchWaitMessage";sndReq("form_bioassay_study",url_waitmessage);var bioas_type='';for(i=0;i<_el("bioas_type").length;i++){if(_el("bioas_type")[i].selected){bioas_type=bioas_type+"'"+_el("bioas_type")[i].value+"',"}}
+if(bioas_type.length>0){bioas_type=bioas_type.slice(0,-1)}
+var url_bioastype="./subBioassayStudy?bioas_type="+bioas_type;sndReq("form_bioassay_study",url_bioastype)}
+function PopulateOnSampMaterial_labresult(){var url_waitmessage="./searchWaitMessage";sndReq("form_labresult_material_analyzed",url_waitmessage);var material='';for(i=0;i<_el("material").length;i++){if(_el("material")[i].selected){material=material+"'"+_el("material")[i].value+"',"}}
+if(material.length>0){material=material.slice(0,-1)}
+var url_material="./subLabResultMaterialAnalyzed?material="+material;sndReq("form_labresult_material_analyzed",url_material)}
+function PopulateOnStnType_labresult(){var url_waitmessage="./searchWaitMessage";sndReq("form_labresult_study_id",url_waitmessage);var loctype='';for(i=0;i<_el("study_loctype").length;i++){if(_el("study_loctype")[i].selected){loctype=loctype+"'"+_el("study_loctype")[i].value+"',"}}
+if(loctype.length>0){loctype=loctype.slice(0,-1)}
+var url_loctype="./subLabResultStudy?loctype="+loctype;sndReq("form_labresult_study_id",url_loctype)}
+function PopulateOnStudy_labresult(){var url_waitmessage="./searchWaitMessage";sndReq("form_labresult_lab_pkg",url_waitmessage);sndReq("form_labresult_anal_type",url_waitmessage);sndReq("form_labresult_analyte",url_waitmessage);var study_id='';for(i=0;i<_el("study_labresult").length;i++){if(_el("study_labresult")[i].selected){study_id=study_id+"'"+_el("study_labresult")[i].value+"',"}}
+if(study_id.length>0){study_id=study_id.slice(0,-1)}
+var url_labpkg="./subLabResultLabPkg?study_id="+study_id;sndReq("form_labresult_lab_pkg",url_labpkg);var url_analtype="./subLabResultAnalType?study_id="+study_id;sndReq("form_labresult_anal_type",url_analtype);var url_analyte="./subLabResultAnalyte?study_id="+study_id;sndReq("form_labresult_analyte",url_analyte)}
+function PopulateOnStudy_fieldmeas_sampmaterial(){var study_id='';for(i=0;i<_el("study_fieldmeas").length;i++){if(_el("study_fieldmeas")[i].selected){study_id=study_id+"'"+_el("study_fieldmeas")[i].value+"',"}}
+if(study_id.length>0){study_id=study_id.slice(0,-1)}
+var url='';url="./subFieldMeasSampMaterial?study_id="+study_id;var divFieldName="form_fieldmeas_samp_material";sndReq(divFieldName,url)}
+function PopulateOnStudy_fieldmeas_taxa(){var study_id='';for(i=0;i<_el("study_fieldmeas").length;i++){if(_el("study_fieldmeas")[i].selected){study_id=study_id+"'"+_el("study_fieldmeas")[i].value+"',"}}
+if(study_id.length>0){study_id=study_id.slice(0,-1)}
+var url_taxa='';url_taxa="./subFieldMeasTaxa?study_id="+study_id;var divFieldName="form_fieldmeas_taxa";sndReq(divFieldName,url_taxa)}
+function PopulateOnStudy_fieldmeas_measurement(){var study_id='';for(i=0;i<_el("study_fieldmeas").length;i++){if(_el("study_fieldmeas")[i].selected){study_id=study_id+"'"+_el("study_fieldmeas")[i].value+"',"}}
+if(study_id.length>0){study_id=study_id.slice(0,-1)}
+var url_measurement='';url_measurement="./subFieldMeasMeasMethod?study_id="+study_id;var divFieldName="form_fieldmeas_measmethod";sndReq(divFieldName,url_measurement)}
+function PopulateOnFSCA_SitePhoto(){var fsca='';for(i=0;i<_el("sitephoto_fsca").length;i++){if(_el("sitephoto_fsca")[i].selected){fsca=fsca+"'"+_el("sitephoto_fsca")[i].value+"',"}}
+if(fsca.length>0){fsca=fsca.slice(0,-1)}
+var url_taxon='';url_taxon="./subSitePhotoTaxon?fsca="+fsca;var divFieldName_taxon="form_sitephoto_taxon";sndReq(divFieldName_taxon,url_taxon);url_search_photo="./subSitePhotoSearch?fsca="+fsca;var divFieldName_search="form_sitephoto_search";sndReq(divFieldName_search,url_search_photo)}
+function PopulateOnDataset_RecData(){var dataset='';for(i=0;i<_el("dataset").length;i++){if(_el("dataset")[i].selected){dataset=dataset+"'"+_el("dataset")[i].value+"',"}}
+if(dataset.length>0){dataset=dataset.slice(0,-1)}
+var url_datagroup='';url_datagroup="./subRecDatagroup?dataset="+dataset;var divDataGroup="form_RecData_datagroup";sndReq(divDataGroup,url_datagroup);var url_element='';url_element="./subRecElement?dataset="+dataset;var divElement="form_RecData_Element";sndReq(divElement,url_element);var url_region='';url_region="./subRecRegion?dataset="+dataset;var divRegion="form_RecData_Region";sndReq(divRegion,url_region);var url_interview_location='';url_interview_location="./subRecInterviewLocation?dataset="+dataset;var divInterviewLocation="form_RecData_Interview_Location";sndReq(divInterviewLocation,url_interview_location);var url_submit='';url_submit="./subRecDataSubmit?dataset="+dataset;var divSubmit="form_RecData_Submit";sndReq(divSubmit,url_submit)}
+function PopulateOnDatagroup_RecData(){var dataset='';for(i=0;i<_el("dataset").length;i++){if(_el("dataset")[i].selected){dataset=dataset+"'"+_el("dataset")[i].value+"',"}}
+if(dataset.length>0){dataset=dataset.slice(0,-1)}
+var datagroup='';for(i=0;i<_el("datagroup").length;i++){if(_el("datagroup")[i].selected){datagroup=datagroup+"'"+_el("datagroup")[i].value+"',"}}
+if(datagroup.length>0){datagroup=datagroup.slice(0,-1)}
+var url_element="./subRecElement?dataset="+dataset+"&datagroup="+datagroup;var divElement="form_RecData_Element";sndReq(divElement,url_element);var url_region="./subRecRegion?dataset="+dataset+"&datagroup="+datagroup;var divRegion="form_RecData_Region";sndReq(divRegion,url_region);var url_interview_location="./subRecInterviewLocation?dataset="+dataset+"&datagroup="+datagroup;var divInterviewLocation="form_RecData_Interview_Location";sndReq(divInterviewLocation,url_interview_location)}
+function PopulateOnElement_RecData(){var dataset='';for(i=0;i<_el("dataset").length;i++){if(_el("dataset")[i].selected){dataset=dataset+"'"+_el("dataset")[i].value+"',"}}
+if(dataset.length>0){dataset=dataset.slice(0,-1)}
+var datagroup='';for(i=0;i<_el("datagroup").length;i++){if(_el("datagroup")[i].selected){datagroup=datagroup+"'"+_el("datagroup")[i].value+"',"}}
+if(datagroup.length>0){datagroup=datagroup.slice(0,-1)}
+var element='';for(i=0;i<_el("element").length;i++){if(_el("element")[i].selected){element=element+"'"+_el("element")[i].value+"',"}}
+if(element.length>0){element=element.slice(0,-1)}
+var url_region="./subRecRegion?dataset="+dataset+"&datagroup="+datagroup+"&element="+element;var divRegion="form_RecData_Region";sndReq(divRegion,url_region);var url_interview_location="./subRecInterviewLocation?dataset="+dataset+"&datagroup="+datagroup+"&element="+element;var divInterviewLocation="form_RecData_Interview_Location";sndReq(divInterviewLocation,url_interview_location)}
+function PopulateOnRegion_RecData(){var dataset='';for(i=0;i<_el("dataset").length;i++){if(_el("dataset")[i].selected){dataset=dataset+"'"+_el("dataset")[i].value+"',"}}
+if(dataset.length>0){dataset=dataset.slice(0,-1)}
+var datagroup='';for(i=0;i<_el("datagroup").length;i++){if(_el("datagroup")[i].selected){datagroup=datagroup+"'"+_el("datagroup")[i].value+"',"}}
+if(datagroup.length>0){datagroup=datagroup.slice(0,-1)}
+var element='';for(i=0;i<_el("element").length;i++){if(_el("element")[i].selected){element=element+"'"+_el("element")[i].value+"',"}}
+if(element.length>0){element=element.slice(0,-1)}
+var region='';for(i=0;i<_el("region").length;i++){if(_el("region")[i].selected){region=region+"'"+_el("region")[i].value+"',"}}
+if(region.length>0){region=region.slice(0,-1)}
+var url_interview_location="./subRecInterviewLocation?dataset="+dataset+"&datagroup="+datagroup+"&element="+element+"&region="+region;var divInterviewLocation="form_RecData_Interview_Location";sndReq(divInterviewLocation,url_interview_location)}
+function ShowSampleID_SitePhoto(){var fsca='';for(i=0;i<_el("sitephoto_fsca").length;i++){if(_el("sitephoto_fsca")[i].selected){fsca=fsca+"'"+_el("sitephoto_fsca")[i].value+"',"}}
+if(fsca.length>0){fsca=fsca.slice(0,-1)}
+var taxon='';for(i=0;i<_el("sitephoto_taxon").length;i++){if(_el("sitephoto_taxon")[i].selected){taxon=taxon+"'"+_el("sitephoto_taxon")[i].value+"',"}}
+if(taxon.length>0){taxon=taxon.slice(0,-1)}
+var url_sampleid='';url_sampleid="./subSitePhotoSampleID?fsca="+fsca+"&taxon="+taxon;var divFieldName="form_sitephoto_sampleid";sndReq(divFieldName,url_sampleid)}
+function PopulateOnTaxon_SitePhoto(){var fsca='';for(i=0;i<_el("sitephoto_fsca").length;i++){if(_el("sitephoto_fsca")[i].selected){fsca=fsca+"'"+_el("sitephoto_fsca")[i].value+"',"}}
+if(fsca.length>0){fsca=fsca.slice(0,-1)}
+var taxon='';for(i=0;i<_el("sitephoto_taxon").length;i++){if(_el("sitephoto_taxon")[i].selected){taxon=taxon+"'"+_el("sitephoto_taxon")[i].value+"',"}}
+if(taxon.length>0){taxon=taxon.slice(0,-1)}
+var url_search_photo="";url_search_photo="./subSitePhotoSearch?fsca="+fsca+"&taxon="+taxon;var divFieldName_search="form_sitephoto_search";sndReq(divFieldName_search,url_search_photo)}
+function PopulateOnSampleID_SitePhoto(){var fsca='';for(i=0;i<_el("sitephoto_fsca").length;i++){if(_el("sitephoto_fsca")[i].selected){fsca=fsca+"'"+_el("sitephoto_fsca")[i].value+"',"}}
+if(fsca.length>0){fsca=fsca.slice(0,-1)}
+var taxon='';for(i=0;i<_el("sitephoto_taxon").length;i++){if(_el("sitephoto_taxon")[i].selected){taxon=taxon+"'"+_el("sitephoto_taxon")[i].value+"',"}}
+if(taxon.length>0){taxon=taxon.slice(0,-1)}
+var sampleid='';for(i=0;i<_el("sitephoto_sampleid").length;i++){if(_el("sitephoto_sampleid")[i].selected){sampleid=sampleid+"'"+_el("sitephoto_sampleid")[i].value+"',"}}
+if(sampleid.length>0){sampleid=sampleid.slice(0,-1)}
+url_search_photo="./subSitePhotoSearch?fsca="+fsca+"&taxon="+taxon+"&sample_id="+sampleid;var divFieldName_search="form_sitephoto_search";sndReq(divFieldName_search,url_search_photo)}
+function PopulateOnCollectionYear_Photo(){var divFieldName="collections_photo";var url_waitmessage="./searchWaitMessage";sndReq(divFieldName,url_waitmessage);var n=_el("collection_year").selectedIndex
+var collection_year=_el("collection_year")[n].value
+var url_collection_photo='';url_collection_photo="./subPhotoCollectionYear?collection_year="+collection_year;sndReq(divFieldName,url_collection_photo);window.location.href="./photo?collection_year="+collection_year}
+function PopulateOnLabPkg_labresult(){var url_waitmessage="./searchWaitMessage";sndReq("form_labresult_anal_type",url_waitmessage);sndReq("form_labresult_analyte",url_waitmessage);var study_id='';for(i=0;i<_el("study_labresult").length;i++){if(_el("study_labresult")[i].selected){study_id=study_id+"'"+_el("study_labresult")[i].value+"',"}}
+if(study_id.length>0){study_id=study_id.slice(0,-1)}
+var lab_pkg='';for(i=0;i<_el("labresult_lab_pkg").length;i++){if(_el("labresult_lab_pkg")[i].selected){lab_pkg=lab_pkg+"'"+_el("labresult_lab_pkg")[i].value+"',"}}
+if(lab_pkg.length>0){lab_pkg=lab_pkg.slice(0,-1)}
+var url_analtype='';url_analtype="./subLabResultAnalType?lab_pkg="+lab_pkg+"&study_id="+study_id;var divFieldName="form_labresult_anal_type";sndReq(divFieldName,url_analtype);var url_analyte='';url_analyte="./subLabResultAnalyte?lab_pkg="+lab_pkg+"&study_id="+study_id;var divFieldName="form_labresult_analyte";sndReq(divFieldName,url_analyte)}
+function PopulateOnAnalType_labresult(){var url_waitmessage="./searchWaitMessage";sndReq("form_labresult_analyte",url_waitmessage);var study_id='';for(i=0;i<_el("study_labresult").length;i++){if(_el("study_labresult")[i].selected){study_id=study_id+"'"+_el("study_labresult")[i].value+"',"}}
+if(study_id.length>0){study_id=study_id.slice(0,-1)}
+var lab_pkg='';for(i=0;i<_el("labresult_lab_pkg").length;i++){if(_el("labresult_lab_pkg")[i].selected){lab_pkg=lab_pkg+"'"+_el("labresult_lab_pkg")[i].value+"',"}}
+if(lab_pkg.length>0){lab_pkg=lab_pkg.slice(0,-1)}
+var analyte_type='';for(i=0;i<_el("labresult_anal_type").length;i++){if(_el("labresult_anal_type")[i].selected){analyte_type=analyte_type+"'"+_el("labresult_anal_type")[i].value+"',"}}
+if(analyte_type.length>0){analyte_type=analyte_type.slice(0,-1)}
+var url='';url="./subLabResultAnalyte?anal_type="+analyte_type+"&study_id="+study_id+"&lab_pkg="+lab_pkg;var divFieldName="form_labresult_analyte";sndReq(divFieldName,url)}
+function PopulateAnalyteRange(){var analyte='';for(i=0;i<_el("d_labresult.analyte").length;i++){if(_el("d_labresult.analyte")[i].selected){analyte=analyte+"'"+_el("d_labresult.analyte")[i].value+"',"}}
+if(analyte.length>0){analyte=analyte.slice(0,-1)}
+var url='';url="./subChemicalRange?analyte="+analyte;var divFieldName="formChemicalRange";sndReq(divFieldName,url)}
+function checkStationData(){var location_id=_el("location_id").value;var data_category=_el("data_category").value;var kml_file=_el("kml_file").value;var full_url='';var divFieldName='divDownloadStationData';var url_waitmessage="./searchWaitMessage"
+sndReq(divFieldName,url_waitmessage);if(location_id.length>0){full_url="./download_station_data?location_id="+location_id+"&searchType="+data_category}
+if(kml_file.length>0){full_url="./download_station_data?kml_file="+kml_file+"&searchType="+data_category}
+sndReq(divFieldName,full_url)}
+function bioassay_update_search(){var study_id='';for(i=0;i<_el("study_id").length;i++){if(_el("study_id")[i].selected){study_id=study_id+"'"+_el("study_id")[i].value+"',"}}
+if(study_id.length>0){study_id=study_id.slice(0,-1)}
+var url='';url="./subBioassayStudyType?study_id="+study_id;var divFieldName="form_bioassay_study_type";sndReq(divFieldName,url)}
+function waitGraph(){var url="./subWaitMessage";var divFieldName="divGraph";sndReq(divFieldName,url)}
+function resetGraph(){var url="./subGraphEmpty";var divFieldName="divGraph";sndReq(divFieldName,url);var divFieldName="frmGWResults";sndReq(divFieldName,url)}
+function checkData(){var data=new Array(3)
+if(_el('analyte').selectedIndex==0){alert('Please select an analyte');return}
+if(_el('material').selectedIndex==0){alert('Please select the material analyzed');return}
+if(_el('basis').selectedIndex==0){alert('Please select the measurement basis');return}
+if(_el('analyte_type').selectedIndex==0){alert('Please select an analyte type');return}
+data[0]=_el('analyte').value;data[1]=_el('material').value;data[2]=_el('basis').value;var url="./subGraphResults?analyte="+data[0]+"&material="+data[1]+"&basis="+data[2];var divFieldName="divData";sndReq(divFieldName,url);var url="./subGraphEmpty";var divFieldName="divGraph";sndReq(divFieldName,url)}
+function DisplayButton(){var data=new Array(3)
+if(_el('analyte').selectedIndex==0){alert('Please select an analyte');return}
+if(_el('material').selectedIndex==0){alert('Please select the material analyzed');return}
+if(_el('basis').selectedIndex==0){alert('Please select the measurement basis');return}
+if(_el('analyte_type').selectedIndex==0){alert('Please select an analyte type');return}
+data[0]=_el('analyte').value;data[1]=_el('material').value;data[2]=_el('basis').value;var url="./subGraphStandardList?analyte="+data[0]+"&material="+data[1]+"&basis="+data[2];var divFieldName="divCriteria";sndReq(divFieldName,url);var url="./subGraphDisplay?analyte="+data[0]+"&material="+data[1]+"&basis="+data[2];var divFieldName="divGraphButton";sndReq(divFieldName,url);var url="./subGraphEmpty";var divFieldName="divGraph";sndReq(divFieldName,url)}
+
